@@ -3,8 +3,32 @@ import Task from "../../models/task.model";
 
 // [GET] /tasks
 export const index = async (req: Request, res: Response) => {
-  const tasks = await Task.find({});
+  const find = {
+    deleted: false
+  };
 
+  // Lọc theo trạng thái
+  const status = req.query.status;
+
+  if(status) {
+    find["status"] = status;
+  }
+  // Hết Lọc theo trạng thái
+ // Sắp xếp
+ const sort = {};
+
+ const sortKey = `${req.query.sortKey}`;
+ const sortValue = req.query.sortValue;
+
+ if(sortKey && sortValue) {
+   sort[sortKey] = sortValue;
+ }
+ // Hết Sắp xếp
+
+ const tasks = await Task
+   .find(find)
+   .sort(sort);
+  
   res.json(tasks);
 }
 
