@@ -38,6 +38,13 @@ export const index = async (req: Request, res: Response) => {
   const skip: number = (page - 1) * limitItems;
   // Hết Phân trang
 
+    // Tìm kiếm
+    if(req.query.keyword) {
+      const regex = new RegExp(`${req.query.keyword}`, "i");
+      find["title"] = regex;
+    }
+    // Hết Tìm kiếm
+  
  const tasks = await Task
    .find(find)
    .limit(limitItems)
@@ -57,4 +64,26 @@ export const detail = async (req: Request, res: Response) => {
   });
 
   res.json(task);
+}
+
+// [PATCH] /tasks/change-status
+export const changeStatus = async (req: Request, res: Response) => {
+  try {
+    const ids: string[] = req.body.ids;
+    const status: string = req.body.status;
+
+    await Task.updateMany({
+      _id: { $in: ids }
+    }, {
+      status: status
+    });
+
+    res.json({
+      message: "Cập nhật dữ liệu thành công!"
+    });
+  } catch (error) {
+    res.json({
+      message: "Not Found"
+    });
+  }
 }
